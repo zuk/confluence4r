@@ -1,1 +1,1 @@
-require 'confluence_remote_data_object'
+require 'confluence/confluence_remote_data_object'
