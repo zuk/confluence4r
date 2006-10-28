@@ -83,13 +83,13 @@ class Confluence::Page < Confluence::RemoteDataObject
   
   ### class methods #########################################################
     
-  def self.find_by_name(name)
-    r = confluence.getPage(DEFAULT_SPACE, name)
+  def self.find_by_name(name, space = DEFAULT_SPACE)
+    r = confluence.getPage(space, name)
     self.new(r)
   end
   
-  def self.find_by_title(title)
-    self.find_by_name(title)
+  def self.find_by_title(title, space = DEFAULT_SPACE)
+    self.find_by_name(title, space)
   end
   
   
@@ -109,6 +109,6 @@ class Confluence::Page < Confluence::RemoteDataObject
     end
     
     def reload_newly_created!
-      self.load_from_object(confluence.getPage(DEFAULT_SPACE, self.name))
+      self.load_from_object(confluence.getPage(self.space, self.name))
     end
 end
