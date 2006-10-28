@@ -1,0 +1,1 @@
+require 'confluence_remote_data_object'
