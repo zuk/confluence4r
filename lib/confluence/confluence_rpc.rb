@@ -13,6 +13,7 @@ require 'logger'
 # puts server.getSpaces()
 #
 module Confluence
+
   class RPC
     attr_reader :log
     
@@ -38,13 +39,16 @@ module Confluence
       begin
         @conf.send(method_name, *([@token] + args))
       rescue XMLRPC::FaultException => e
-        log.error "#{e}: #{e.message}"
+        log.error "#{e}: #{e.faultString}"
         if (e.faultString.include?("InvalidSessionException"))
           do_login
           retry
         else
-          raise e.faultString
+          raise RemoteException.new(e)
         end
+      rescue
+        log.error "#{e}: #{e.message}"
+        raise RemoteException.new(e.message)
       end
     end
     
@@ -54,8 +58,26 @@ module Confluence
       begin
         @token = @conf.login(@user, @pass)
       rescue XMLRPC::FaultException => e
-        raise e.faultString
+        log.error "#{e}: #{e.faultCode}"
+        raise RemoteAuthenticationException.new(e)
       end
     end
+  end
+  
+  
+  class RemoteException < Exception
+    def initialize(msg = nil, type = nil)
+      if msg.kind_of? XMLRPC::FaultException
+        msg.faultString =~ /^.*?:\s(.*?):\s(.*)/
+        msg = $2
+        type = $1
+      end
+    
+      super(msg)
+      @type = type
+    end
+  end
+  
+  class RemoteAuthenticationException < RemoteException
   end
 end

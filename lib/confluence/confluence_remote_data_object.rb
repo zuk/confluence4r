@@ -11,13 +11,15 @@ class Confluence::RemoteDataObject
   
   class_inheritable_accessor :attr_conversions, :readonly_attrs
   class_inheritable_accessor :save_method, :get_method, :destroy_method
-
   
   attr_accessor :attributes
-  attr_reader :confluence, :encore
   
   def self.confluence
     Confluence::Connection.connect
+  end
+  
+  def confluence
+    @confluence ||= Confluence::Connection.connect
   end
   
   # TODO: encore-specific code probably shouldn't be here...
@@ -25,9 +27,11 @@ class Confluence::RemoteDataObject
   	Confluence::Connection.connect(:service => "encore")
   end
   
+  def encore
+    @encore ||= Confluence::Connection.connect(:service => "encore")
+  end
+  
   def initialize(data_object = nil)
-    @confluence = Confluence::Connection.connect
-    @encore = Confluence::Connection.connect("encore")
     @changed_attr = []
     self.attributes = {}
     load_from_object(data_object) unless data_object.nil?
@@ -53,7 +57,7 @@ class Confluence::RemoteDataObject
     
     raise NotImplementedError.new("Can't call #{self}.save because no @@save_method is defined for this class") unless self.save_method
     
-    confluence.send(self.class.send(:save_method), data)
+    self.confluence.send(self.class.send(:save_method), data)
     
     # we need to reload because the version number has probably changed
     reload
@@ -151,9 +155,8 @@ class Confluence::RemoteDataObject
   ###########################################################################
   
   protected
-    # Returns the raw XML-RPC anonymous object with the
-    # data corresponding to the given id. This depends
-    # on the get_method class attribute, which must
+    # Returns the raw XML-RPC anonymous object with the data corresponding to 
+    # the given id. This depends on the get_method class attribute, which must
     # be defined for this method to work.
     def self.get(id)
       raise NotImplementedError.new("Can't call #{self}.get(#{id}) because no get_method is defined for this class") unless self.get_method
