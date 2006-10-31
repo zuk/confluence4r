@@ -7,7 +7,7 @@ module Confluence::Connection
   @@username = nil
   @@password = nil
 
-  def connect(service = "confluence1")
+  def connect(options = {:service => "confluence1"})
     self.load_confluence_config!
     
     unless confluence_url and confluence_username and confluence_password

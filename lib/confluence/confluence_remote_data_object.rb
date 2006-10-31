@@ -22,7 +22,7 @@ class Confluence::RemoteDataObject
   
   # TODO: encore-specific code probably shouldn't be here...
   def self.encore
-  	Confluence.connection.connect("encore")
+  	Confluence::Connection.connect(:service => "encore")
   end
   
   def initialize(data_object = nil)
