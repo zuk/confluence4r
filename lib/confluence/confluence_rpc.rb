@@ -46,9 +46,6 @@ module Confluence
         else
           raise RemoteException.new(e)
         end
-      rescue
-        log.error "#{e}: #{e.message}"
-        raise RemoteException.new(e.message)
       end
     end
     
