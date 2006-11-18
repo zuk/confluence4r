@@ -14,6 +14,8 @@ class Confluence::RemoteDataObject
   
   attr_accessor :attributes
   
+  attr_accessor :confluence, :encore
+  
   def self.confluence
     Confluence::Connection.connect
   end
@@ -32,7 +34,6 @@ class Confluence::RemoteDataObject
   end
   
   def initialize(data_object = nil)
-    @changed_attr = []
     self.attributes = {}
     load_from_object(data_object) unless data_object.nil?
   end
@@ -59,7 +60,7 @@ class Confluence::RemoteDataObject
     
     self.confluence.send(self.class.send(:save_method), data)
     
-    # we need to reload because the version number has probably changed
+    # we need to reload because the version number has probably changed, we want the new ID, etc.
     reload
     
     after_save if respond_to? :after_save
@@ -72,7 +73,7 @@ class Confluence::RemoteDataObject
       self.load_from_object(self.class.send(:get, self.id))
     else
       # We don't have an ID, so try to use alternate method for reloading. (This is for newly created records that may not yet have an id assigned)
-      raise NotImplementedError.new("Can't reload this #{self.class} because it does not have an id and does not implement the reload_newly_created! method.") unless self.respond_to? :reload_newly_created!
+      raise NotImplementedError, "Can't reload this #{self.class} because it does not have an id and does not implement the reload_newly_created! method." unless self.respond_to? :reload_newly_created!
       self.reload_newly_created!
     end
     
