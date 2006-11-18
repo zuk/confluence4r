@@ -51,6 +51,18 @@ class Confluence::User < Confluence::RemoteDataObject
     confluence.removeUserFromGroup(username, group)
   end
   
+  def has_permission?(permtype, page)
+    if permtype == :edit
+      group_or_name = page.edit_group
+    else
+      group_or_name = page.view_group
+    end
+        
+    return true if group_or_name.nil?
+    return true if group_or_name == username
+    return in_group?(group_or_name)
+  end
+  
   def to_s
     self.username
   end
