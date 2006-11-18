@@ -27,6 +27,14 @@ class Confluence::Page < Confluence::RemoteDataObject
     #self.creator = self.confluence_user unless self.include? :creator
   end
   
+  def name=(new_name)
+    self.title = new_name
+  end
+  
+  def name
+    self.title
+  end
+  
   def content=(new_content)
     # make sure metadata doesn't get overwritten
     old_metadata = self.metadata.entries if self.content
@@ -52,7 +60,7 @@ class Confluence::Page < Confluence::RemoteDataObject
   end
   
   def edit_group=(group)
-    encore.setPageEditGroup(self.name, group)
+    encore.setPageEditGroup(self.title, group)
   end
   
   def edit_group
@@ -65,7 +73,7 @@ class Confluence::Page < Confluence::RemoteDataObject
   end
   
   def view_group=(group)
-    encore.setPageViewGroup(self.name, group)
+    encore.setPageViewGroup(self.title, group)
   end
   
   def view_group
@@ -81,15 +89,23 @@ class Confluence::Page < Confluence::RemoteDataObject
   	confluence.getPagePermissions(self.id.to_s)
   end
   
-  ### class methods #########################################################
+  ### callbacks ###############################################################
+  
+  def before_save
+    raise "Cannot save this page because it has no title and/or space." unless self.title and self.space
+  end
+  
+  #############################################################################
+  
+  ### class methods ###########################################################
     
   def self.find_by_name(name, space = DEFAULT_SPACE)
-    r = confluence.getPage(space, name)
-    self.new(r)
+    find_by_title(name, space)    
   end
   
   def self.find_by_title(title, space = DEFAULT_SPACE)
-    self.find_by_name(title, space)
+    r = confluence.getPage(space, title)
+    self.new(r)
   end
   
   
@@ -109,6 +125,6 @@ class Confluence::Page < Confluence::RemoteDataObject
     end
     
     def reload_newly_created!
-      self.load_from_object(confluence.getPage(self.space, self.name))
+      self.load_from_object(confluence.getPage(self.space, self.title))
     end
 end
