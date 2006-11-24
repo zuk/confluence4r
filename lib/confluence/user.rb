@@ -77,6 +77,7 @@ class Confluence::User < Confluence::RemoteDataObject
     find(username)
   end
   
+  # DEPRECATED: this method is confusing since it could be taken as meaning "find by first/last name"
   def self.find_by_name(username)
     find_by_username(username)
   end
