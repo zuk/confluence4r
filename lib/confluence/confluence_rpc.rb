@@ -44,7 +44,7 @@ module Confluence
           do_login
           retry
         else
-          raise RemoteException.new(e)
+          raise RemoteException, e.respond_to?(:message) ? e.message : e
         end
       rescue
         log.error "#{$!}"
