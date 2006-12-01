@@ -94,8 +94,12 @@ class Confluence::User < Confluence::RemoteDataObject
   
   def self.find_all
     # FIXME: this is really slow... we should probably just look in the confluence database instead
-    usernames = confluence.getActiveUsers(true)
+    usernames = find_all_usernames
     usernames.collect{|u| find_by_username(u)}
+  end
+  
+  def self.find_all_usernames
+    confluence.getActiveUsers(true)
   end
   
   class NoSuchUser < Exception
