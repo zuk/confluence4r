@@ -1,5 +1,5 @@
 require 'active_support'
-require 'confluence/confluence_connection'
+require 'confluence/confluence_connector'
 
 # Abstract object representing some piece of data in Confluence.
 # This must be overridden by a child class that defines values
@@ -7,7 +7,6 @@ require 'confluence/confluence_connection'
 # implements its own get and save methods.
 class Confluence::RemoteDataObject
 #  include Reloadable
-  include Confluence::Connection
   
   class_inheritable_accessor :attr_conversions, :readonly_attrs
   class_inheritable_accessor :save_method, :get_method, :destroy_method
@@ -16,21 +15,31 @@ class Confluence::RemoteDataObject
   
   attr_accessor :confluence, :encore
   
+  @@connector = nil
+  
+  def self.connector=(connector)
+    @@connector = connector
+  end
+  
   def self.confluence
-    Confluence::Connection.connect
+    raise "Cannot establish confluence connection because the connector has not been set." unless @@connector
+    @@connector.connect
   end
   
   def confluence
-    @confluence ||= Confluence::Connection.connect
+    raise "Cannot establish confluence connection because the connector has not been set." unless @@connector
+    @@connector.connect
   end
   
-  # TODO: encore-specific code probably shouldn't be here...
+  # TODO: encore-specific code like this probably shouldn't be here...
   def self.encore
-  	Confluence::Connection.connect(:service => "encore")
+    raise "Cannot establish confluence connection because the connector has not been set." unless @@connector
+  	@@connector.connect("encore")
   end
   
   def encore
-    @encore ||= Confluence::Connection.connect(:service => "encore")
+    raise "Cannot establish confluence connection because the connector has not been set." unless @@connector
+    @@connector.connect("encore")
   end
   
   def initialize(data_object = nil)

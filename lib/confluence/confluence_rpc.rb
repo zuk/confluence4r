@@ -59,7 +59,7 @@ module Confluence
         @token = @conf.login(@user, @pass)
       rescue XMLRPC::FaultException => e
         log.error "#{e}: #{e.faultString}"
-        raise RemoteAuthenticationException, e.faultString
+        raise RemoteAuthenticationException, e
       end
     end
   end
