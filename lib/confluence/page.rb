@@ -118,7 +118,7 @@ class Confluence::Page < Confluence::RemoteDataObject
           self.metadata['#{metadata_key}']
         end
         def #{accessor.to_s}=(val)
-          self.metadata['#{metadata_key}'] = val
+          self.metadata['#{metadata_key}'] = val.gsub("\n", " ")
         end
       END
       module_eval f
