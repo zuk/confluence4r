@@ -104,7 +104,16 @@ class Confluence::Page < Confluence::RemoteDataObject
   end
   
   def self.find_by_title(title, space = DEFAULT_SPACE)
-    r = confluence.getPage(space, title)
+    begin
+      r = confluence.getPage(space, title)
+    rescue Confluence::RemoteException => e
+      # FIXME: dangerous to be checking based on error string like this...
+      if e.message =~ /does not exist/
+        return nil
+      else
+        raise e
+      end
+    end
     self.new(r)
   end
   

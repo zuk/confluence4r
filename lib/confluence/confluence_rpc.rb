@@ -39,7 +39,7 @@ module Confluence
       begin
         @conf.send(method_name, *([@token] + args))
       rescue XMLRPC::FaultException => e
-        log.error "#{e}: #{e.faultString}"
+        log.error "#{e}: #{e.message}"
         if (e.faultString.include?("InvalidSessionException"))
           do_login
           retry
@@ -48,7 +48,7 @@ module Confluence
         end
       rescue
         log.error "#{$!}"
-        raise RemoteException.new($!)
+        raise $!
       end
     end
     
