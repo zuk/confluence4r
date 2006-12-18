@@ -21,6 +21,10 @@ class Confluence::RemoteDataObject
     @@connector = connector
   end
   
+  def self.connector
+    @@connector
+  end
+  
   def self.confluence
     raise "Cannot establish confluence connection because the connector has not been set." unless @@connector
     @@connector.connect
