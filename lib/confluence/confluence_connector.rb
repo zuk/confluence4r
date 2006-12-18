@@ -1,7 +1,6 @@
 require 'yaml'
 
 require 'confluence/confluence_rpc'
-require 'singleton'
 
 class Confluence::Connector
   
