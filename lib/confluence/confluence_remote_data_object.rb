@@ -155,15 +155,20 @@ class Confluence::RemoteDataObject
   end
   
   def as_datetime(val)
-    val =~ /\w{3} (\w{3}) (\d{2}) (\d{2}):(\d{2}):(\d{2}) (\w{3}) (\d{4})/
-    month = $1
-    day = $2
-    hour = $3
-    minute = $4
-    second = $5
-    tz = $6
-    year = $7
-    Time.local(year, month, day, hour, minute, second)
+    if val.is_a?(String) 
+      # for older versions of Confluence (pre 2.7?)
+      val =~ /\w{3} (\w{3}) (\d{2}) (\d{2}):(\d{2}):(\d{2}) (\w{3}) (\d{4})/
+      month = $1
+      day = $2
+      hour = $3
+      minute = $4
+      second = $5
+      tz = $6
+      year = $7
+      Time.local(year, month, day, hour, minute, second)
+    else
+      Time.local(val.year, val.month, val.day, val.hour, val.min, val.sec)
+    end
   end
   
   ###########################################################################
